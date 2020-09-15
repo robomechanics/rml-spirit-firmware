@@ -1,7 +1,8 @@
 topics:
-  joint_encoder: /joint_encoder
-  imu: /imu
+  joint_encoder: /mcu/state/jointState
+  imu: /mcu/state/imu
   state_estimate: /state_estimate
+  control_torques: /rml/mpc/torques
 
 mpc_controller:
   update_rate: 100
@@ -11,3 +12,10 @@ ekf_estimator:
   
 contact_detection:
   update_rate: 250
+
+clark_trot_controller:
+  update_rate: 100
+  step_duration: 0.4
+  
+
+
