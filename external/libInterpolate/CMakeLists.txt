@@ -100,6 +100,10 @@ include(CMakePackageConfigHelpers)
 
 install(FILES
   ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
+<<<<<<< HEAD
+  #${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+=======
+>>>>>>> origin
   DESTINATION cmake
   )
 
@@ -154,17 +158,3 @@ install(EXPORT libInterpTargets
   NAMESPACE libInterp::
   DESTINATION cmake
 )
-file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/libInterpConfig.cmake
-"message(WARNING \"libInterp has been renamed libInterpolate. Please use find_package(libInterpolate) and the libInterpolate::Interpolate target.\")
-include(CMakeFindDependencyMacro)
-find_dependency(Boost)
-find_dependency(Eigen3 3.3.1 CONFIG)
-include(\${CMAKE_CURRENT_LIST_DIR}/libInterpTargets.cmake)
-"
-  )
-include(CMakePackageConfigHelpers)
-
-install(FILES
-  ${CMAKE_CURRENT_BINARY_DIR}/libInterpConfig.cmake
-  DESTINATION cmake
-  )
