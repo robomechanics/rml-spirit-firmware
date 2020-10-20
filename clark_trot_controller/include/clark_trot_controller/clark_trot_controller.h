@@ -2,8 +2,7 @@
 #define CLARK_TROT_CONTROLLER_H
 
 #include <ros/ros.h>
-#include <sensor_msgs/JointState.h>
-#include <spirit_msgs/TorqueCommand.h>
+#include <std_msgs/Float64.h>
 //! Implements open loop clark trot controller
 /*!
    ClarkTrotController implements all control logic. It should expose a constructor that does any initialization required and an update method called at some frequency.
@@ -23,17 +22,10 @@ class ClarkTrotController {
 	void spin();
 
 private:
-  /**
-   * @brief Callback function to handle new joint encoder data
-   * @param[in] joint_encoder_msg sensor_msgs<JointState> containing joint pos,vel,current
-   */
-  void jointEncoderCallback(const sensor_msgs::JointState::ConstPtr& msg);
 
-  /// Subscriber for joint encoder messages
-  ros::Subscriber joint_encoder_sub_;
-
-  /// Publisher for desired control torques
-  ros::Publisher control_torques_pub_;
+	/// Publisher for desired joint positions
+	ros::Publisher joint0_pub_,joint1_pub_,joint2_pub_,joint3_pub_,joint4_pub_,
+					joint5_pub_,joint6_pub_,joint7_pub_;
 
 	/// Nodehandle to pub to and sub from
 	ros::NodeHandle nh_;
