@@ -66,7 +66,7 @@ find_package(Boost REQUIRED COMPONENTS system)
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
+   INCLUDE_DIRS include
 #  LIBRARIES minitaur_gazebo
 #  CATKIN_DEPENDS other_catkin_pkg
 #  DEPENDS system_lib
@@ -78,13 +78,13 @@ catkin_package(
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
-include_directories(SYSTEM ${Boost_INCLUDE_DIRS} ${GAZEBO_INCLUDE_DIRS} src)
+include_directories(SYSTEM include ${Boost_INCLUDE_DIRS} ${GAZEBO_INCLUDE_DIRS} src)
 include_directories(${catkin_INCLUDE_DIRS})
 link_directories(${GAZEBO_LIBRARY_DIRS})
 list(APPEND CMAKE_CXX_FLAGS "${GAZEBO_CXX_FLAGS}")
 
 ## Declare a C++ library
-add_library(contact SHARED src/ContactPlugin.cc)
+add_library(contact SHARED src/contact_plugin.cpp)
 
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
