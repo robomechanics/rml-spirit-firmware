@@ -46,7 +46,7 @@ SOFTWARE.
     <remap from="joint_states" to="/spirit/joint_states"/>
   </node>
 
-  <!-- Launch ros_controllers -->
   <rosparam file="$(find gazebo_scripts)/config/spirit_control.yaml" command="load"/>
   <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen" ns="/spirit" args="joint_state_controller joint_controller"/>
+
 </launch>

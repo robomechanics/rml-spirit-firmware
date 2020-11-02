@@ -67,6 +67,7 @@ find_package(Boost REQUIRED COMPONENTS system)
 
 catkin_package(
   CATKIN_DEPENDS
+    spirit_msgs
     angles
     controller_interface
     control_msgs
@@ -91,6 +92,7 @@ list(APPEND CMAKE_CXX_FLAGS "${GAZEBO_CXX_FLAGS}")
 ## Declare a C++ library
 add_library(contact SHARED src/contact_plugin.cpp)
 add_library(controller SHARED src/controller_plugin.cpp)
+add_dependencies(controller ${catkin_EXPORTED_TARGETS})
 add_library(ground_truth_estimator SHARED src/estimator_plugin.cpp)
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context

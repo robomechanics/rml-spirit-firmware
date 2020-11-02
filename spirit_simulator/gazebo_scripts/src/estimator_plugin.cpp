@@ -41,8 +41,6 @@ namespace gazebo{
     if(update_rate_>0 && (current_time-last_time_).Double() < 1.0/update_rate_) //update rate check
       return;
 
-    std::cout << (current_time-last_time_).Double() << std::endl;
-
     // Extract all relevant information from simulator
     physics::LinkPtr body_link = model_->GetChildLink("body");
     if (!body_link)
@@ -50,11 +48,11 @@ namespace gazebo{
       ROS_ERROR("Can't find body link in sdf. Make sure the name in the plugin matches the sdf.");
       return;
     }
-    ignition::math::Pose3d pose = body_link->RelativePose();
+    ignition::math::Pose3d pose = body_link->WorldPose();
     ignition::math::Vector3d lin_pos = pose.Pos();
     ignition::math::Quaternion<double> ang_pos = pose.Rot();
-    ignition::math::Vector3d lin_vel = body_link->RelativeLinearVel();
-    ignition::math::Vector3d ang_vel = body_link->RelativeAngularVel();
+    ignition::math::Vector3d lin_vel = body_link->WorldLinearVel();
+    ignition::math::Vector3d ang_vel = body_link->WorldAngularVel();
 
     // Update and publish state estimate message
     spirit_msgs::StateEstimate state;

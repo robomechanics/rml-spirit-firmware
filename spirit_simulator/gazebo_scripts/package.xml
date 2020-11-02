@@ -50,9 +50,6 @@
   <!--   <doc_depend>doxygen</doc_depend> -->
   <buildtool_depend>catkin</buildtool_depend>
 
-  <depend>controller_manager</depend>
-  <depend>joint_state_controller</depend>
-  <depend>robot_state_publisher</depend>
   <depend>spirit_msgs</depend>
   <depend>angles</depend>
   <depend>controller_interface</depend>
@@ -63,7 +60,16 @@
   <depend>forward_command_controller</depend>
   <depend>pluginlib</depend>
 
-
+  <build_depend>controller_manager</build_depend>
+  <build_depend>joint_state_controller</build_depend>
+  <build_depend>robot_state_publisher</build_depend>
+  <build_export_depend>controller_manager</build_export_depend>
+  <build_export_depend>joint_state_controller</build_export_depend>
+  <build_export_depend>robot_state_publisher</build_export_depend>
+  <exec_depend>controller_manager</exec_depend>
+  <exec_depend>joint_state_controller</exec_depend>
+  <exec_depend>robot_state_publisher</exec_depend>
+  
   <!-- The export tag contains other, unspecified, tags -->
   <export>
     <controller_interface plugin="${prefix}/spirit_controller_plugin.xml"/>

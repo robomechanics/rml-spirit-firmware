@@ -899,12 +899,12 @@ SOFTWARE.
     <dynamics damping="0.0" friction="0.0"/>
   </joint>
   
+  <!-- Add ros_control plugin -->
   <gazebo>
-    <!-- Add ros_control plugin -->
     <plugin filename="libgazebo_ros_control.so" name="gazebo_ros_control">
       <robotNamespace>/spirit</robotNamespace>
-      <robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>
     </plugin>
   </gazebo> 
+
 </robot>
 
