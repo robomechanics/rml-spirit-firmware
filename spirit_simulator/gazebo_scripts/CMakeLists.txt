@@ -91,9 +91,12 @@ list(APPEND CMAKE_CXX_FLAGS "${GAZEBO_CXX_FLAGS}")
 
 ## Declare a C++ library
 add_library(contact SHARED src/contact_plugin.cpp)
+
 add_library(controller SHARED src/controller_plugin.cpp)
 add_dependencies(controller ${catkin_EXPORTED_TARGETS})
+
 add_library(ground_truth_estimator SHARED src/estimator_plugin.cpp)
+add_dependencies(controller ${catkin_EXPORTED_TARGETS})
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
