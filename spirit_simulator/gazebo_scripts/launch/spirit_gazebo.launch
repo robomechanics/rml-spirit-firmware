@@ -34,7 +34,7 @@ SOFTWARE.
     <arg name="physics" value="ode"/>
   </include>
 
-  <param name="robot_description" textfile="$(find spirit_description)/urdf/spirit_gazebo.urdf" />
+  <param name="robot_description" textfile="$(find spirit_description)/urdf/spirit_meshes.urdf" />
   <param name="robot_description_sdf" textfile="$(find spirit_description)/sdf/spirit.sdf" />
 
   <!-- Spawn SDF model -->
