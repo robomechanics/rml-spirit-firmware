@@ -2,7 +2,7 @@
 #define CLARK_TROT_CONTROLLER_H
 
 #include <ros/ros.h>
-#include <std_msgs/Float64.h>
+#include <spirit_msgs/MotorCommandArray.h>
 //! Implements open loop clark trot controller
 /*!
    ClarkTrotController implements all control logic. It should expose a constructor that does any initialization required and an update method called at some frequency.
@@ -26,8 +26,7 @@ private:
   void sendJointPositions(double &elapsed_time);
 
 	/// Publisher for desired joint positions
-	ros::Publisher joint0_pub_,joint1_pub_,joint2_pub_,joint3_pub_,joint4_pub_,
-					joint5_pub_,joint6_pub_,joint7_pub_,joint8_pub_,joint9_pub_,joint10_pub_,joint11_pub_;
+	ros::Publisher joint_control_pub_;
 
 	/// Nodehandle to pub to and sub from
 	ros::NodeHandle nh_;
