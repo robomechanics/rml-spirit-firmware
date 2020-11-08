@@ -26,7 +26,6 @@ SOFTWARE.
 
 <launch>
 
-  <arg name="run_software" default="false"/>
   <arg name="gui" default="false"/>
   <arg name="paused" default="true"/>
 
@@ -47,18 +46,8 @@ SOFTWARE.
   <rosparam file="$(find gazebo_scripts)/config/spirit_control.yaml" command="load"/>
   <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen" ns="/spirit" args="joint_state_controller joint_controller"/>
 
-
-  <group if="$(arg run_software)">
-    <!-- Launch robot software! -->
-    <include file="$(find spirit_utils)/launch/spirit.launch">
-      <arg name="with_gazebo" value="true"/>
-    </include>
-  </group>
-
-  <group unless="$(arg run_software)">
-    <!-- Launch robot software! -->
-    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher">
-    </node>
-  </group>
+  <!--<node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher">
+    <remap from="joint_states" to="/mcu/state/jointURDF"/>
+  </node>-->
   
 </launch>

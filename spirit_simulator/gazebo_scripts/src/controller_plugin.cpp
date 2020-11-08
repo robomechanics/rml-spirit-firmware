@@ -46,8 +46,6 @@ namespace effort_controllers
       return false;
     }
 
-    pid_controllers_.resize(n_joints_);
-
     for(unsigned int i=0; i<n_joints_; i++)
     {
       const auto& joint_name = joint_names_[i];
@@ -69,10 +67,6 @@ namespace effort_controllers
         return false;
       }
       joint_urdfs_.push_back(joint_urdf);
-
-      // Load PID Controller using default gains
-      pid_controllers_[i].initPid(100,0,1,0,0,false);
-
     }
 
     commands_buffer_.writeFromNonRT(BufferType(n_joints_));
@@ -86,33 +80,33 @@ namespace effort_controllers
     BufferType & commands = *commands_buffer_.readFromRT();
     for(unsigned int i=0; i<n_joints_; i++)
     {
-        // Collect position setpoint, feedforward torque and feedback gains from buffer
-        double command_position = commands.at(i).position;
+        // Collect feedforward torque 
         double torque_ff = commands.at(i).torque_ff;
-        double kp = commands.at(i).kp;
-        double kd = commands.at(i).kd;
-
-        // Collect current position from simulator
-        double current_position = joints_.at(i).getPosition();
-
-        // Make sure joint is within limits if applicable
-        enforceJointLimits(command_position, i);
-
+        
         // Compute position error
-        double error;
+        double command_position = commands.at(i).pos_setpoint;
+        enforceJointLimits(command_position, i);
+        double current_position = joints_.at(i).getPosition();
+        double kp = commands.at(i).kp;
+        double pos_error;
         angles::shortest_angular_distance_with_large_limits(
           current_position,
           command_position,
           joint_urdfs_[i]->limits->lower,
           joint_urdfs_[i]->limits->upper,
-          error);
+          pos_error);
 
-        // Set the PID error and compute the PID command with nonuniform
-        // time step size.
-        pid_controllers_.at(i).setGains(kp, 0, kd, 0, 0); // 0 Terms correspond to integral control
-        double feedback_gain = pid_controllers_.at(i).computeCommand(error, period);
+        // Compute velocity error
+        double current_vel = joints_.at(i).getVelocity();
+        double command_vel = commands.at(i).vel_setpoint;
+        double vel_error = command_vel - current_vel;
+        double kd = commands.at(i).kd;
 
-        joints_.at(i).setCommand(feedback_gain + torque_ff);
+        // Collect feedback 
+        double torque_feedback = kp * pos_error + kd * vel_error;
+
+        // Update joint torque
+        joints_.at(i).setCommand(torque_feedback + torque_ff);
     }
   }
 

@@ -29,7 +29,7 @@
     <node name="mpc_controller" pkg="mpc_controller" type="mpc_controller_node" output="screen"/>
 
     <!-- Launch the stand-in robot interface node -->
-    <node name="robot_interface" pkg="spirit_utils" type="robot_interface_node" output="screen"/>
+    <!-- <node name="robot_interface" pkg="spirit_utils" type="robot_interface_node" output="screen"/> -->
 
     <!-- Launch the grid map visualizer -->
     <node pkg="grid_map_visualization" type="grid_map_visualization" name="grid_map_visualization" output="screen">
@@ -41,6 +41,7 @@
 
     <!-- Launch the nodes to publish all the robot tfs and visualize in rviz -->
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher">
+        <remap from="joint_states" to="/mcu/state/jointURDF"/>
     </node>
 
     <!-- Launch the node to publish the visual topics for the plans -->

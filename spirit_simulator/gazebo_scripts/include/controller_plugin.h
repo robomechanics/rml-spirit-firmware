@@ -37,7 +37,6 @@ public:
 
 private:
   ros::Subscriber sub_command_;
-  std::vector<control_toolbox::Pid> pid_controllers_;       /**< Internal PID controllers. */
   std::vector<urdf::JointConstSharedPtr> joint_urdfs_;
 
   void commandCB(const spirit_msgs::MotorCommandArrayConstPtr& msg);

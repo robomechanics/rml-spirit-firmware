@@ -29,7 +29,8 @@ void ClarkTrotController::sendJointPositions(double &elapsed_time)
 		msg.motor_commands.at(i).kp = 100;
 		msg.motor_commands.at(i).kd = 1;
 		msg.motor_commands.at(i).torque_ff = 0;
-		msg.motor_commands.at(i).position = positions.at(i);
+		msg.motor_commands.at(i).pos_setpoint = positions.at(i);
+    msg.motor_commands.at(i).vel_setpoint = 0;
 	}
 
 	msg.header.stamp = ros::Time::now();

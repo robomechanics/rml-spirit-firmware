@@ -1,10 +1,11 @@
-# This is a message to hold the desired position, feedforward torques and PD gains for a joint on Spirit
+# This is a message to hold the desired position, desired velocity, feedforward torques and control gains for a single joint on Spirit
 #
 # Accurate timing information is stored in the header
 
 Header header
 
-float64 position # Position command
+float64 pos_setpoint # Position command
+float64 vel_setpoint # Velocity command
+float32 kp # Position setpoint gain
+float32 kd # Derivative setpoint gain
 float64 torque_ff # Feedforward torque
-float32 kp # Position gain on PD Controller
-float32 kd # Derivative gain on PD Controller
