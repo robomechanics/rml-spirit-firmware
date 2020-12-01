@@ -10,4 +10,10 @@
         <rosparam file="$(find mocap_optitrack)/config/mocap.yaml" />
     </node>
 
+<<<<<<< HEAD
+=======
+    <node name="ground_truth_publisher" pkg="spirit_utils" type="robot_interface_node" output="screen"/>
+
+
+>>>>>>> main
 </launch>

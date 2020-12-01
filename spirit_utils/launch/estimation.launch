@@ -2,7 +2,11 @@
 
     <rosparam command="load" file="$(find spirit_utils)/../config/project_params.yaml"/>
 
+<<<<<<< HEAD
     <!-- Launch the node to publish state estimate messages-->
+=======
+    <!-- Launch the node to publish ground truth messages-->
+>>>>>>> main
     <node name="ground_truth_publisher" pkg="spirit_utils" type="ground_truth_publisher_node" output="screen"/>
 
     <!-- Launch the node to publish state estimate messages-->
