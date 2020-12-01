@@ -47,11 +47,7 @@ bool MBLinkConverter::sendMBlink()
   
   float data[58] = {0};
   memcpy(data,limbcmd,4*sizeof(LimbCmd_t));
-<<<<<<< HEAD
-  mblink_->sendUser(Eigen::Map<const Eigen::Matrix<float,58,1> >(data));
-=======
   mblink_.sendUser(Eigen::Map<const Eigen::Matrix<float,58,1> >(data));
->>>>>>> main
 
   return true;
 }
