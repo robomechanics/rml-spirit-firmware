@@ -21,12 +21,14 @@ find_package(catkin REQUIRED COMPONENTS
   spirit_msgs
   grid_map_core
   grid_map_ros
+  pcl_conversions
+  pcl_ros
 )
 
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES spirit_utils
-#  CATKIN_DEPENDS roscpp std_msgs
+  CATKIN_DEPENDS pcl_conversions pcl_ros roscpp sensor_msgs
 #	DEPENDS
 )
 
@@ -51,6 +53,7 @@ add_library(spirit_utils
   src/math_utils.cpp
   src/kinematics.cpp
   src/trajectory_publisher.cpp
+  src/unify_gnd_map.cpp
 )
 add_dependencies(spirit_utils ${spirit_utils_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(spirit_utils)
@@ -63,6 +66,7 @@ add_executable(terrain_map_publisher_node src/terrain_map_publisher_node.cpp)
 add_executable(ground_truth_publisher_node src/ground_truth_publisher_node.cpp)
 add_executable(trajectory_publisher_node src/trajectory_publisher_node.cpp)
 add_executable(robot_proxy_node src/robot_proxy_node.cpp)
+add_executable(unify_gnd_map_node src/unify_gnd_map_node.cpp)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(rviz_interface_node
@@ -91,6 +95,10 @@ target_link_libraries(robot_proxy_node
 )
 
 
+target_link_libraries(unify_gnd_map_node
+  spirit_utils
+  ${catkin_LIBRARIES}
+)
 
 #############
 ## Testing ##

@@ -57,6 +57,9 @@
   <build_depend>spirit_msgs</build_depend>
   <build_depend>grid_map_core</build_depend>
   <build_depend>grid_map_ros</build_depend>
+  <build_depend>pcl_conversions</build_depend>
+  <build_depend>pcl_ros</build_depend>
+
   <build_export_depend>roscpp</build_export_depend>
   <build_export_depend>std_msgs</build_export_depend>
   <build_export_depend>nav_msgs</build_export_depend>
@@ -65,6 +68,9 @@
   <build_export_depend>spirit_msgs</build_export_depend>
   <build_export_depend>grid_map_core</build_export_depend>
   <build_export_depend>grid_map_ros</build_export_depend>
+  <build_export_depend>pcl_conversions</build_export_depend>
+  <build_export_depend>pcl_ros</build_export_depend>
+
   <exec_depend>roscpp</exec_depend>
   <exec_depend>std_msgs</exec_depend>
   <exec_depend>nav_msgs</exec_depend>
@@ -73,7 +79,11 @@
   <exec_depend>spirit_msgs</exec_depend>
   <exec_depend>grid_map_core</exec_depend>
   <exec_depend>grid_map_ros</exec_depend>
+  <exec_depend>pcl_conversions</exec_depend>
+  <exec_depend>pcl_ros</exec_depend>
 
+  <build_depend>libpcl-all-dev</build_depend> 
+  <exec_depend>libpcl-all</exec_depend> 
   <!-- The export tag contains other, unspecified, tags -->
   <export>
     <!-- Other tools can request additional information be placed here -->
