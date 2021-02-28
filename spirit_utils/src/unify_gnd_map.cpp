@@ -38,10 +38,14 @@ void UnifyGndMap::spin(const std::string &stl_file) {
     //Convert stl to pcl data structure 
     loadCloudFromSTL(stl_file); 
 
-    scaleDown(0.01); 
-    //Save pcl data structure to pcd file 
+    //Scale down point cloud map
+    scaleDown(0.01);
+
+
+    //Save point cloud map to pcd file 
     pcl::io::savePCDFileASCII("test_pcd.pcd",my_cloud_scaled); 
 
+    //Filter the old map
     filterPointCloud("test_pcd.pcd","new_cloud.pcd");
     
 
@@ -55,11 +59,11 @@ void UnifyGndMap::spin(const std::string &stl_file) {
 
 
 
-int UnifyGndMap::filterPointCloud(const char *Loadfile , const char *SaveFile) {
+int UnifyGndMap::filterPointCloud(const char *loadFile , const char *saveFile) {
     /// Create the cloud object and load it from PCD file
     pcl::PointCloud<pcl::PointXYZ>::Ptr Cloud_in (new pcl::PointCloud<pcl::PointXYZ>);
 
-    if (pcl::io::loadPCDFile<pcl::PointXYZ> ( Loadfile, *Cloud_in) == -1) //* load the file
+    if (pcl::io::loadPCDFile<pcl::PointXYZ> ( loadFile, *Cloud_in) == -1) //* load the file
     {
         PCL_ERROR ("Couldn't read file test_pcd.pcd \n");
         return (-1);
@@ -67,14 +71,14 @@ int UnifyGndMap::filterPointCloud(const char *Loadfile , const char *SaveFile) {
 
     pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_filtered (new pcl::PointCloud<pcl::PointXYZ>);
 
-    /// Filter the cloud, Remove any points which have the coordinate Z=0
+    /// Filter the cloud, Remove any points which have the coordinate Z=0 and set equal to map
     pcl::PassThrough<pcl::PointXYZ> pass;
     pass.setInputCloud (Cloud_in);
     pass.setFilterFieldName ("z");
     pass.setFilterLimits (0.0,0.0);
     pass.setFilterLimitsNegative (true);
     pass.filter (*cloud_filtered);
-    pcl::io::savePCDFileASCII(SaveFile, *cloud_filtered);
+    pcl::io::savePCDFileASCII(saveFile, *cloud_filtered);
     my_cloud_scaled = *cloud_filtered; 
     std::cerr << "\nFiltered " << Cloud_in->points.size () - cloud_filtered->points.size () << " data points\n" << std::endl;
     return 0;
@@ -83,7 +87,7 @@ int UnifyGndMap::filterPointCloud(const char *Loadfile , const char *SaveFile) {
 
 
 void UnifyGndMap::scaleDown(float scale_factor) { 
-
+    //Homogeneous transformation matrix uniformally scaled 
     Eigen::Matrix4f transform = Eigen::Matrix4f::Identity(); 
     transform(0,0) = transform(0,0) * scale_factor; 
     transform(1,1) = transform(1,1) * scale_factor; 
@@ -91,3 +95,4 @@ void UnifyGndMap::scaleDown(float scale_factor) {
 
     pcl::transformPointCloud(my_cloud,my_cloud_scaled,transform); 
 }
+

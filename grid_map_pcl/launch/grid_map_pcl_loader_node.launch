@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <launch>
-  <arg name="folder_path"            default="/home/adam/spiirt_ws"/>
+  <arg name="folder_path"            default="/home/adam/pcl_gmap_ws"/>
   <arg name="pcd_filename"           default="new_cloud.pcd" />
   <arg name="map_rosbag_topic"       default="grid_map" />
   <arg name="output_grid_map"        default="elevation_map.bag" />
@@ -10,7 +10,7 @@
   <arg name="prefix"                 default=""/>
   <arg name="set_verbosity_to_debug" default="false"/>
 
-  <node pkg="spirit_utils" type="unify_gnd_map_node" name="unify_gnd_map" output="screen"/>
+  <node pkg="unify_gnd_map" type="unify_gnd_map_node" name="unify_gnd_map" output="screen"/>
 
   <node name="grid_map_pcl_loader_node" pkg="grid_map_pcl"
       type="grid_map_pcl_loader_node" output="screen" launch-prefix="$(arg prefix)">
@@ -23,19 +23,4 @@
     <param name="map_layer_name"          type="string" value="$(arg map_layer_name)" />
     <param name="set_verbosity_to_debug"  type="bool" value="$(arg set_verbosity_to_debug)" />
   </node>
-
-
-    <!-- Launch the grid map filters demo node. -->
-  <node pkg="grid_map_demos" type="filters_demo" name="grid_map_filter_demo" output="screen">
-    <!-- Input topic -->
-  	<param name="input_topic" value="/grid_map_pcl_loader_node/grid_map_from_raw_pointcloud" />
-  	<!-- Output topic -->
-  	<param name="output_topic" value="filtered_map" />
-  	<!-- Load grid map filter chain configuration -->
-    <rosparam command="load" file="$(find grid_map_demos)/config/filters_demo_filter_chain.yaml" />
-  </node>
-  
-  
-   <node name="rviz" pkg="rviz" type="rviz" args="-d $(find spirit_utils)/rviz/config.rviz"/>
-
 </launch>
