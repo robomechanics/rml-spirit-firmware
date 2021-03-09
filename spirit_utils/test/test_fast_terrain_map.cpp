@@ -1,8 +1,9 @@
 #include <ros/ros.h>
 #include <gtest/gtest.h>
-
+#include <grid_map_core/grid_map_core.hpp>
 #include "spirit_utils/fast_terrain_map.h"
-
+#include "spirit_utils/terrain_quality_processing.h"
+#include <iostream> 
 TEST(FastTerrainMapTest, testConstructor) {
   ros::NodeHandle nh;
   FastTerrainMap fast_terrain_map;
@@ -36,7 +37,7 @@ TEST(FastTerrainMapTest, testProjection) {
   Eigen::Vector3d direction = {0,0,-1};
 
   auto t_start = std::chrono::steady_clock::now();
-  Eigen::Vector3d intersection = fast_terrain_map.projectToMap(point, direction);
+  //Eigen::Vector3d intersection = fast_terrain_map.projectToMap(point, direction);
   auto t_end = std::chrono::steady_clock::now();
   std::chrono::duration<double> time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t_end - t_start);
   // std::cout << "projectToMap took " << time_span.count() << " seconds." << std::endl;
@@ -45,3 +46,52 @@ TEST(FastTerrainMapTest, testProjection) {
 
   EXPECT_EQ(1 + 1, 2);
 }
+
+TEST(FastTerrainMapTest, testGridMapQuery) { 
+  ros::NodeHandle nh;
+  grid_map::GridMap gm({"elevation"});
+
+  gm.setFrameId("map");
+  gm.setGeometry(grid_map::Length(1.2, 2.0), 0.03);
+
+  for (grid_map::GridMapIterator it(gm); !it.isPastEnd(); ++it) {
+    grid_map::Position position;
+    gm.getPosition(*it, position);
+    gm.at("elevation", *it) = -0.04 + 0.2 * std::sin(5.0 * position.y()) * position.x();
+  } 
+
+  grid_map::Matrix& elevation = gm["elevation"];
+  grid_map::Position cent(0.01,0.01); 
+  double radius = 0.1;
+  
+  grid_map::SpiralIterator iter(gm,cent,radius); 
+  grid_map::Index iter_index = *iter; 
+  TerrainQualityProcessing tqp(nh); 
+  
+  //Benchmark Here
+  double cost = tqp.getCost(elevation,iter_index);
+
+  EXPECT_EQ(1 + 1, 2);
+
+}
+
+TEST(FastTerrainMapTest, testFastMapQuery) {
+  ros::NodeHandle nh; 
+  grid_map::GridMap gm({"z"});
+  gm.setFrameId("map");
+  gm.setGeometry(grid_map::Length(1.2, 2.0), 0.03);
+
+  for (grid_map::GridMapIterator it(gm); !it.isPastEnd(); ++it) {
+    grid_map::Position position;
+    gm.getPosition(*it, position);
+    gm.at("z", *it) = -0.04 + 0.2 * std::sin(5.0 * position.y()) * position.x();
+  } 
+  FastTerrainMap fast_terrain_map;
+  fast_terrain_map.loadDataFromGridMap(gm);  
+
+  //Benchmark Here
+  fast_terrain_map.getGroundHeight(0.1,0.1); 
+  
+  EXPECT_EQ(1 + 1, 2);
+
+} 

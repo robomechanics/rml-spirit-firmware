@@ -35,7 +35,8 @@
     <rosparam command="load" file="$(find grid_map_demos)/config/filters_demo_filter_chain.yaml" />
   </node>
   
-  
-   <node name="rviz" pkg="rviz" type="rviz" args="-d $(find spirit_utils)/rviz/config.rviz"/>
+  <node pkg="spirit_utils" type="terrain_map_processing_node" name="terrain_map_processing" output="screen"/>
+
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find spirit_utils)/rviz/config.rviz"/>
 
 </launch>

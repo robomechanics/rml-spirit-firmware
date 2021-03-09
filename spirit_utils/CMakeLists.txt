@@ -54,6 +54,7 @@ add_library(spirit_utils
   src/kinematics.cpp
   src/trajectory_publisher.cpp
   src/unify_gnd_map.cpp
+  src/terrain_quality_processing.cpp
 )
 add_dependencies(spirit_utils ${spirit_utils_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(spirit_utils)
@@ -67,7 +68,7 @@ add_executable(ground_truth_publisher_node src/ground_truth_publisher_node.cpp)
 add_executable(trajectory_publisher_node src/trajectory_publisher_node.cpp)
 add_executable(robot_proxy_node src/robot_proxy_node.cpp)
 add_executable(unify_gnd_map_node src/unify_gnd_map_node.cpp)
-
+add_executable(terrain_quality_processing_node src/terrain_quality_processing_node.cpp)
 ## Specify libraries to link a library or executable target against
 target_link_libraries(rviz_interface_node
   spirit_utils
@@ -100,6 +101,11 @@ target_link_libraries(unify_gnd_map_node
   ${catkin_LIBRARIES}
 )
 
+
+target_link_libraries(terrain_quality_processing_node 
+  spirit_utils
+  ${catkin_LIBRARIES}
+)
 #############
 ## Testing ##
 #############
