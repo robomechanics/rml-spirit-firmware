@@ -289,23 +289,17 @@ void addFullStates(FullState start_state, std::vector<State> interp_reduced_plan
     filtered_yaw[i] = wrap(filtered_yaw[i]);
   }
 
-  // for (int i = 1; i < num_states; i++) {
-  //   yaw[i] = weight*yaw_init_state[i] + (1-weight)*yaw_traj[i];
-  //   yaw[i] = unwrap(yaw[i-1], yaw[i]);
-  //   filtered_yaw[i] = unwrap(filtered_yaw[i-1], filtered_yaw[i]);
-  // }
-
-  plt::clf();
-  plt::ion();
-  plt::named_plot("yaw", interp_t, yaw);
-  plt::named_plot("yaw_init_state", interp_t, yaw_init_state);
-  plt::named_plot("yaw_traj", interp_t, yaw_traj);
-  plt::named_plot("filtered yaw", interp_t, filtered_yaw);
-  plt::xlabel("t");
-  plt::ylabel("z");
-  plt::legend();
-  plt::show();
-  plt::pause(0.001);
+  // plt::clf();
+  // plt::ion();
+  // plt::named_plot("z", interp_t, z);
+  // plt::named_plot("filtered z", interp_t, filtered_z);
+  // plt::named_plot("z rate", interp_t, z_rate);
+  // plt::named_plot("filtered z rate", interp_t, filtered_z_rate);
+  // plt::xlabel("t");
+  // plt::ylabel("z");
+  // plt::legend();
+  // plt::show();
+  // plt::pause(0.001);
 
   // Add full state data into the array
   for (int i = 0; i < num_states; i++) {
