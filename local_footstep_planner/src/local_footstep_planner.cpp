@@ -15,7 +15,7 @@ LocalFootstepPlanner::LocalFootstepPlanner(ros::NodeHandle nh) {
     foot_plan_discrete_topic, "/foot_plan_discrete");
   nh.param<std::string>("topics/foot_plan_continuous", 
     foot_plan_continuous_topic, "/foot_plan_continuous");
-  nh.param<std::string>("topics/state/ground_truth", 
+  nh.param<std::string>("topics/state/trajectory", 
     robot_state_topic, "/state/ground_truth");
   nh.param<std::string>("map_frame",map_frame_,"map");
 
@@ -83,9 +83,7 @@ void LocalFootstepPlanner::robotStateCallback(
   if (body_plan_msg_ == NULL)
     return;
 
-  if (robot_state_msg_ == NULL) {
-    robot_state_msg_ = msg;
-  }
+  robot_state_msg_ = msg;
 
 }
 
@@ -150,21 +148,21 @@ void LocalFootstepPlanner::updateDiscretePlan() {
 
     FootstepState footstep(4);
 
-    // If we have robot state data, apply the current foot position for the first cycle
-    if (robot_state_msg_ != NULL) {
-      // Load the data into the footstep array and push into the plan
-      footstep[0] = robot_state_msg_->feet.feet[j].position.x;
-      footstep[1] = robot_state_msg_->feet.feet[j].position.y;
-      footstep[2] = 0.0;
-      if (t_offsets_trot[j] < 0.5*period_) {
-        footstep[3] = t_s[j];
-      } else {
-        footstep[3] = period_;
-      }
+    // // If we have robot state data, apply the current foot position for the first cycle
+    // if (robot_state_msg_->header.stamp == plan_timestamp_) {
+    //   // Load the data into the footstep array and push into the plan
+    //   footstep[0] = robot_state_msg_->feet.feet[j].position.x;
+    //   footstep[1] = robot_state_msg_->feet.feet[j].position.y;
+    //   footstep[2] = 0.0;
+    //   if (t_offsets_trot[j] < 0.5*period_) {
+    //     footstep[3] = t_s[j];
+    //   } else {
+    //     footstep[3] = period_;
+    //   }
 
-      footstep_plan_[j].push_back(footstep);
-      start_index = 1;
-    }
+    //   footstep_plan_[j].push_back(footstep);
+    //   start_index = 1;
+    // }
 
     double t_cycle;
     double t_cycle_end;

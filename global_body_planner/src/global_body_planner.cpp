@@ -14,7 +14,7 @@ GlobalBodyPlanner::GlobalBodyPlanner(ros::NodeHandle nh) {
     {8.0,0.0,0.3,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
 
   nh.param<std::string>("topics/terrain_map", terrain_map_topic_, "/terrain_map");
-  nh.param<std::string>("topics/state/ground_truth", robot_state_topic_, "/state/ground_truth");
+  nh.param<std::string>("topics/state/trajectory", robot_state_topic_, "/state/ground_truth");
   nh.param<std::string>("topics/body_plan", body_plan_topic, "/body_plan");
   nh.param<std::string>("topics/discrete_body_plan", discrete_body_plan_topic, "/discrete_body_plan");
   nh.param<std::string>("topics/goal_state", goal_state_topic, "/clicked_point");

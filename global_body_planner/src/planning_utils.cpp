@@ -192,6 +192,20 @@ bool isWithinBounds(State s1, State s2, const PlannerConfig &planner_config)
   return (stateDistance(s1, s2) <= planner_config.GOAL_BOUNDS);
 }
 
+double unwrap(double previous_angle, double new_angle) {
+    double d = new_angle - previous_angle;
+    d = d > M_PI ? d - 2 * M_PI : (d < -M_PI ? d + 2 * M_PI : d);
+    return previous_angle + d;
+}
+
+double wrap(double x){
+    x = fmod(x + M_PI,2*M_PI);
+    if (x < 0)
+        x += 2*M_PI;
+    return x - M_PI;
+}
+
+
 void addFullStates(FullState start_state, std::vector<State> interp_reduced_plan, double dt, 
   std::vector<FullState> &interp_full_plan, const PlannerConfig &planner_config) {
 
@@ -210,6 +224,8 @@ void addFullStates(FullState start_state, std::vector<State> interp_reduced_plan
   std::vector<double> pitch_rate(num_states);
   std::vector<double> filtered_pitch_rate(num_states);
   std::vector<double> yaw(num_states);
+  std::vector<double> yaw_init_state(num_states);
+  std::vector<double> yaw_traj(num_states);
   std::vector<double> filtered_yaw(num_states);
   std::vector<double> yaw_rate(num_states);
   std::vector<double> filtered_yaw_rate(num_states);
@@ -218,6 +234,8 @@ void addFullStates(FullState start_state, std::vector<State> interp_reduced_plan
   z[0] = start_state[2];
   pitch[0] = start_state[4];
   yaw[0] = start_state[5];
+  yaw_init_state[0] = yaw[0];
+  yaw_traj[0] = atan2(interp_reduced_plan[0][4],interp_reduced_plan[0][3]);
   double gamma = 0.9;
 
   // Compute yaw to align with heading, pitch and height to align with the terrain
@@ -226,7 +244,28 @@ void addFullStates(FullState start_state, std::vector<State> interp_reduced_plan
     State body_state = interp_reduced_plan[i];
     z[i] = weight*z[0] + (1-weight)*body_state[2];
     pitch[i] = weight*pitch[0] + (1-weight)*getPitchFromState(body_state,planner_config);
-    yaw[i] = weight*yaw[0] + (1-weight)*atan2(body_state[4],body_state[3]);
+    yaw_init_state[i] = yaw[0];
+
+    // If velocity is too small just hold the last value to avoid the singularity
+    if (body_state[4]*body_state[4] + body_state[3]*body_state[3] < 1e-4) {
+      yaw_traj[i] = yaw_traj[i-1];
+    } else {
+      yaw_traj[i] = atan2(body_state[4],body_state[3]);
+    }
+
+    yaw_traj[i] = unwrap(yaw_traj[i-1], yaw_traj[i]);
+  }
+
+  if (abs(yaw[0] + 2*M_PI - yaw_traj.back()) < abs(yaw[0] - yaw_traj.back())) {
+    yaw[0] += 2*M_PI;
+  } else if (abs(yaw[0] - 2*M_PI - yaw_traj.back()) < abs(yaw[0] - yaw_traj.back())) {
+    yaw[0] -= 2*M_PI;
+  }
+
+  for (int i = 1; i < num_states; i++) {
+    double weight = pow(gamma,i);
+    yaw_init_state[i] = yaw[0];
+    yaw[i] = weight*yaw_init_state[i] + (1-weight)*yaw_traj[i];
   }
 
   // Filter yaw and compute its derivative via central difference method
@@ -246,19 +285,27 @@ void addFullStates(FullState start_state, std::vector<State> interp_reduced_plan
   std::vector<double> interp_t(num_states);
   for (int i = 0; i < num_states; i++) {
     interp_t[i] = i*dt;
+    yaw[i] = wrap(yaw[i]);
+    filtered_yaw[i] = wrap(filtered_yaw[i]);
   }
 
-  // plt::clf();
-  // plt::ion();
-  // plt::named_plot("z", interp_t, z);
-  // plt::named_plot("filtered z", interp_t, filtered_z);
-  // plt::named_plot("z rate", interp_t, z_rate);
-  // plt::named_plot("filtered z rate", interp_t, filtered_z_rate);
-  // plt::xlabel("t");
-  // plt::ylabel("z");
-  // plt::legend();
-  // plt::show();
-  // plt::pause(0.001);
+  // for (int i = 1; i < num_states; i++) {
+  //   yaw[i] = weight*yaw_init_state[i] + (1-weight)*yaw_traj[i];
+  //   yaw[i] = unwrap(yaw[i-1], yaw[i]);
+  //   filtered_yaw[i] = unwrap(filtered_yaw[i-1], filtered_yaw[i]);
+  // }
+
+  plt::clf();
+  plt::ion();
+  plt::named_plot("yaw", interp_t, yaw);
+  plt::named_plot("yaw_init_state", interp_t, yaw_init_state);
+  plt::named_plot("yaw_traj", interp_t, yaw_traj);
+  plt::named_plot("filtered yaw", interp_t, filtered_yaw);
+  plt::xlabel("t");
+  plt::ylabel("z");
+  plt::legend();
+  plt::show();
+  plt::pause(0.001);
 
   // Add full state data into the array
   for (int i = 0; i < num_states; i++) {
