@@ -105,6 +105,57 @@ double LocalFootstepPlanner::computeTimeUntilNextFlight(double t) {
   return t_remaining;
 }
 
+void LocalFootstepPlanner::initializeDiscretePlan() {
+
+  // Clear out the old footstep plan
+  footstep_plan_.clear();
+  footstep_plan_.resize(num_feet_);
+
+  spirit_msgs::MultiFootPlanDiscrete multi_foot_plan_discrete_msg;
+  multi_foot_plan_discrete_msg.header.stamp = ros::Time::now();
+  multi_foot_plan_discrete_msg.header.frame_id = map_frame_;
+
+  // If we have robot state data, apply the current foot position for the first cycle
+  for (int j = 0; j < num_feet_; j++) {
+
+    spirit_msgs::FootPlanDiscrete foot_plan_discrete_msg;
+    foot_plan_discrete_msg.header = multi_foot_plan_discrete_msg.header;
+
+    spirit_msgs::FootState foot_state_msg;
+
+    foot_state_msg.position.x = robot_state_msg_->feet.feet[j].position.x;
+    foot_state_msg.position.y = robot_state_msg_->feet.feet[j].position.y;
+
+    foot_state_msg.position.z = terrain_.getGroundHeight(
+      foot_state_msg.position.x,foot_state_msg.position.y);
+    foot_state_msg.velocity.x = 0;
+    foot_state_msg.velocity.y = 0;
+    foot_state_msg.velocity.z = 0;
+    foot_state_msg.contact = true;
+
+    foot_state_msg.header.stamp = foot_plan_discrete_msg.header;
+
+
+
+
+    footstep[0] = robot_state_msg_->feet.feet[j].position.x;
+    footstep[1] = robot_state_msg_->feet.feet[j].position.y;
+    footstep[2] = 0.0;
+    if (t_offsets_trot[j] < 0.5*period_) {
+      footstep[3] = t_s[j];
+    } else {
+      footstep[3] = period_;
+    }
+
+    footstep_plan_[j].push_back(footstep);
+
+    for (int i = 1; i < num_cycles_; i++) {
+
+    }
+  }    
+}
+
+
 void LocalFootstepPlanner::updateDiscretePlan() {
   // spirit_utils::FunctionTimer timer(__FUNCTION__);
 

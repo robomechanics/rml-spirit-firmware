@@ -160,6 +160,7 @@ void TrajectoryPublisher::publishTrajectoryState() {
   
   // Interpolate to get the correct state and publish it
   spirit_msgs::RobotState interp_state = math_utils::interpRobotStateTraj(traj_msg_,t);
+  interp_state.header.stamp = ros::Time::now();
   // spirit_msgs::RobotState interp_state = math_utils::interpRobotStateTraj(traj_msg_,t_mod);
   trajectory_state_pub_.publish(interp_state);
 }

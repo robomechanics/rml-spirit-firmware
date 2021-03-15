@@ -10,9 +10,9 @@ if nargin>0
     bSave = true;
 else
     % Specify the trial name and settings
-    trialName = 'GBP_ID_ffGRF_2021-02-26';
-    bAnimate = true;
-    bSave = true;
+    trialName = 'spirit_log_current';
+    bAnimate = false;
+    bSave = false;
 end
 
 % Check that this is the right current directory otherwise paths won't work
