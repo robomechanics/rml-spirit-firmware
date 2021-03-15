@@ -263,8 +263,8 @@ void addFullStates(FullState start_state, std::vector<State> interp_reduced_plan
   // Add full state data into the array
   for (int i = 0; i < num_states; i++) {
     State body_state = interp_reduced_plan[i];
-    body_state[2] = filtered_z[i];
-    body_state[8] = filtered_z_rate[i];
+    // body_state[2] = filtered_z[i];
+    // body_state[8] = filtered_z_rate[i];
     FullState body_full_state = stateToFullState(body_state, roll, pitch[i],
       filtered_yaw[i], roll_rate, filtered_pitch_rate[i], filtered_yaw_rate[i]);
 
@@ -476,7 +476,7 @@ State applyStance(State s, Action a, double t, const PlannerConfig &planner_conf
   s_new[4] = dy_td + a_y_td*t + (a_y_to - a_y_td)*t*t/(2.0*t_s);
 
   if (a[7] == 0 && planner_config.is_height_random == false) {
-    s_new[2] = 0.3+getHeightFromState(s_new, planner_config);//a_z_td + (a_z_to - a_z_td)*(t/t_s) + getHeightFromState(s_new, planner_config);
+    s_new[2] = a_z_td + (a_z_to - a_z_td)*(t/t_s) + getHeightFromState(s_new, planner_config);
     s_new[5] = 0;
   } else {
     s_new[2] = z_td + dz_td*t + 0.5*a_z_td*t*t + (a_z_to - a_z_td)*(t*t*t)/(6.0*t_s);
@@ -556,7 +556,7 @@ State applyStanceReverse(State s, Action a, double t, const PlannerConfig &plann
   s_new[2] = z_to - cz*(t_s - t) - 0.5*a_z_td*(t_s*t_s - t*t) - (a_z_to - a_z_td)*(t_s*t_s*t_s - t*t*t)/(6.0*t_s);
 
   if (a[7] == 0 && planner_config.is_height_random == false) {
-    s_new[2] = 0.3+getHeightFromState(s_new, planner_config);//a_z_td + (a_z_to - a_z_td)*(t/t_s) + getHeightFromState(s_new, planner_config);
+    s_new[2] = a_z_td + (a_z_to - a_z_td)*(t/t_s) + getHeightFromState(s_new, planner_config);
     s_new[5] = 0;
   } else {
     s_new[5] = dz_to - a_z_td*(t_s - t) - (a_z_to - a_z_td)*(t_s*t_s - t*t)/(2.0*t_s);

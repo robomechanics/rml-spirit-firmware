@@ -262,7 +262,7 @@ void GlobalBodyPlanner::callPlanner() {
       std::cout << "Path duration: " << path_duration << " s" << std::endl;
       std::cout << std::endl;
 
-      double dt = 0.1;
+      double dt = 0.05;
       getInterpPlan(start_state_, state_sequence_, action_sequence_, dt, replan_start_time_, 
         body_plan_, grf_plan_, t_plan_, primitive_id_plan_, planner_config_);
 
