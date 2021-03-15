@@ -16,8 +16,8 @@ TrajectoryPublisher::TrajectoryPublisher(ros::NodeHandle nh) {
     trajectory_state_topic, "/state/trajectory");
   nh.param<std::string>("topics/trajectory", 
     trajectory_topic, "/trajectory");
-    nh.param<std::string>("topics/state/ground_truth", 
-    ground_truth_state_topic, "/state/ground_truth");
+  nh.param<std::string>("topics/state/ground_truth", 
+  ground_truth_state_topic, "/state/ground_truth");
 
   nh.param<std::string>("map_frame",map_frame_,"map");
   nh.param<std::string>("trajectory_publisher/traj_source", traj_source_, "topic");
@@ -159,8 +159,8 @@ void TrajectoryPublisher::publishTrajectoryState() {
   double t_mod = fmod(t, t_traj_.back());
   
   // Interpolate to get the correct state and publish it
-  spirit_msgs::RobotState interp_state = math_utils::interpRobotStateTraj(traj_msg_,t);
-  // spirit_msgs::RobotState interp_state = math_utils::interpRobotStateTraj(traj_msg_,t_mod);
+  // spirit_msgs::RobotState interp_state = math_utils::interpRobotStateTraj(traj_msg_,t);
+  spirit_msgs::RobotState interp_state = math_utils::interpRobotStateTraj(traj_msg_,t_mod);
   trajectory_state_pub_.publish(interp_state);
 }
 

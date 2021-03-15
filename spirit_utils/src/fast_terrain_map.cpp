@@ -269,7 +269,7 @@ std::array<double, 3> FastTerrainMap::getSurfaceNormal(const double x, const dou
     return surf_norm;
 }
 
-std::array<double, 3> FastTerrainMap::getSurfaceNormalFiltered(const double x, const double y)
+std::array<double, 3> FastTerrainMap::getSurfaceNormalFiltered(const double x, const double y) const
 {
     std::array<double, 3> surf_norm;
 
@@ -321,7 +321,7 @@ std::array<double, 3> FastTerrainMap::getSurfaceNormalFiltered(const double x, c
     return surf_norm;
 }
 
-Eigen::Vector3d FastTerrainMap::projectToMap(const Eigen::Vector3d point, const Eigen::Vector3d direction) {
+Eigen::Vector3d FastTerrainMap::projectToMap(const Eigen::Vector3d point, const Eigen::Vector3d direction) const {
   // spirit_utils::FunctionTimer timer(__FUNCTION__);
 
   Eigen::Vector3d direction_norm = direction;

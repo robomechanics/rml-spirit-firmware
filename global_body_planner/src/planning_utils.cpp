@@ -295,8 +295,13 @@ GRF getGRF(Action a,double t, const PlannerConfig &planner_config) {
 }
 
 double getPitchFromState(State s, const PlannerConfig &planner_config) {
+  std::array<double, 3> surf_norm;
 
-  std::array<double, 3> surf_norm = planner_config.terrain.getSurfaceNormal(s[0], s[1]);
+  if (planner_config.use_filt_terrain) {
+    surf_norm = planner_config.terrain.getSurfaceNormalFiltered(s[0], s[1]);
+  } else {
+    surf_norm = planner_config.terrain.getSurfaceNormal(s[0], s[1]);
+  }
 
   double denom = s[3]*s[3] + s[4]*s[4];
 
@@ -316,7 +321,11 @@ double getPitchFromState(State s, const PlannerConfig &planner_config) {
 
 double getHeightFromState(State s, const PlannerConfig &planner_config) {
 
-  return (planner_config.terrain.getGroundHeight(s[0], s[1]));
+  if (planner_config.use_filt_terrain) {
+    return (planner_config.terrain.getGroundHeightFiltered(s[0], s[1]));
+  } else {
+    return (planner_config.terrain.getGroundHeight(s[0], s[1]));
+  }
 
 }
 
@@ -463,15 +472,15 @@ State applyStance(State s, Action a, double t, const PlannerConfig &planner_conf
 
   s_new[0] = x_td + dx_td*t + 0.5*a_x_td*t*t + (a_x_to - a_x_td)*(t*t*t)/(6.0*t_s);
   s_new[1] = y_td + dy_td*t + 0.5*a_y_td*t*t + (a_y_to - a_y_td)*(t*t*t)/(6.0*t_s);
-  s_new[2] = z_td + dz_td*t + 0.5*a_z_td*t*t + (a_z_to - a_z_td)*(t*t*t)/(6.0*t_s);
   s_new[3] = dx_td + a_x_td*t + (a_x_to - a_x_td)*t*t/(2.0*t_s);
   s_new[4] = dy_td + a_y_td*t + (a_y_to - a_y_td)*t*t/(2.0*t_s);
-  s_new[5] = dz_td + a_z_td*t + (a_z_to - a_z_td)*t*t/(2.0*t_s);
 
-  if (a[7] == 0) {
-    s_new[2] = a_z_td + (a_z_to - a_z_td)*(t/t_s) + getHeightFromState(s_new, planner_config);
-    // s_new[2] = getHeightFromState(s_new, planner_config);
-    s_new[5] = 0;//sqrt(s_new[3]*s_new[3] + s_new[4]*s_new[4])*sin();
+  if (a[7] == 0 && planner_config.is_height_random == false) {
+    s_new[2] = 0.3+getHeightFromState(s_new, planner_config);//a_z_td + (a_z_to - a_z_td)*(t/t_s) + getHeightFromState(s_new, planner_config);
+    s_new[5] = 0;
+  } else {
+    s_new[2] = z_td + dz_td*t + 0.5*a_z_td*t*t + (a_z_to - a_z_td)*(t*t*t)/(6.0*t_s);
+    s_new[5] = dz_td + a_z_td*t + (a_z_to - a_z_td)*t*t/(2.0*t_s);
   }
 
   return s_new;
@@ -546,10 +555,12 @@ State applyStanceReverse(State s, Action a, double t, const PlannerConfig &plann
   s_new[1] = y_to - cy*(t_s - t) - 0.5*a_y_td*(t_s*t_s - t*t) - (a_y_to - a_y_td)*(t_s*t_s*t_s - t*t*t)/(6.0*t_s);
   s_new[2] = z_to - cz*(t_s - t) - 0.5*a_z_td*(t_s*t_s - t*t) - (a_z_to - a_z_td)*(t_s*t_s*t_s - t*t*t)/(6.0*t_s);
 
-  if (a[7] == 0) {
-    s_new[2] = a_z_to + (a_z_td - a_z_to)*(t/t_s) + getHeightFromState(s_new, planner_config);
-    // s_new[2] = getHeightFromState(s_new, planner_config);
-    s_new[5] = 0;//sqrt(s_new[3]*s_new[3] + s_new[4]*s_new[4])*sin();
+  if (a[7] == 0 && planner_config.is_height_random == false) {
+    s_new[2] = 0.3+getHeightFromState(s_new, planner_config);//a_z_td + (a_z_to - a_z_td)*(t/t_s) + getHeightFromState(s_new, planner_config);
+    s_new[5] = 0;
+  } else {
+    s_new[5] = dz_to - a_z_td*(t_s - t) - (a_z_to - a_z_td)*(t_s*t_s - t*t)/(2.0*t_s);
+    s_new[2] = z_to - cz*(t_s - t) - 0.5*a_z_td*(t_s*t_s - t*t) - (a_z_to - a_z_td)*(t_s*t_s*t_s - t*t*t)/(6.0*t_s);
   }
 
   return s_new;
@@ -593,6 +604,11 @@ Action getRandomAction(std::array<double, 3> surf_norm, const PlannerConfig &pla
   a[5] = f_to[2]/planner_config.M_CONST - planner_config.G_CONST;
   a[6] = t_s;
   a[7] = t_f;
+
+  if (planner_config.is_planar) {
+    a[1] = 0.0;
+    a[4] = 0.0;
+  }
 
   return a;
 }

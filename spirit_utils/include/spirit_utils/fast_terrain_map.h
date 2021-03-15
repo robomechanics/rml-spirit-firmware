@@ -88,14 +88,14 @@ class FastTerrainMap {
      * @param[in] double y location
      * @return std::array<double, 3> surface normal at location [x,y]
      */
-    std::array<double, 3> getSurfaceNormalFiltered(const double x,const double y);
+    std::array<double, 3> getSurfaceNormalFiltered(const double x,const double y) const;
 
     /**
      * @brief Return the (approximate) intersection of the height map and a vector. Returned point lies exactly on the map but not entirely on the vector.
      * @param[in] point The point at which the vector originates
      * @param[in] direction The direction along which to project the point
      */
-    Eigen::Vector3d projectToMap(const Eigen::Vector3d point, const Eigen::Vector3d direction);
+    Eigen::Vector3d projectToMap(const Eigen::Vector3d point, const Eigen::Vector3d direction) const;
 
     /**
      * @brief Return the vector of x_data of the map
