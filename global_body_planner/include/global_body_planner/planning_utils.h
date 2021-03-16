@@ -23,6 +23,7 @@ struct PlannerConfig {
 
   // Define kinematic constraint parameters
   double H_MAX = 0.375;           // Maximum height of leg base, m
+  double H_NOM = 0.3;             // Nominal height of leg base, m
   double H_MIN = 0.125;          // Minimum ground clearance of body corners, m
   double V_MAX = 4.0;           // Maximum robot velocity, m/s (4.0 for cheetah, 2.5 for anymal)
   double V_NOM = 0.25;           // Nominal velocity, m/s (used during connect function)

@@ -36,12 +36,17 @@ GlobalBodyPlanner::GlobalBodyPlanner(ros::NodeHandle nh) {
   goal_state_sub_ = nh_.subscribe(goal_state_topic,1,&GlobalBodyPlanner::goalStateCallback, this);
   body_plan_pub_ = nh_.advertise<spirit_msgs::BodyPlan>(body_plan_topic,1);
   discrete_body_plan_pub_ = nh_.advertise<spirit_msgs::BodyPlan>(discrete_body_plan_topic,1);
+  best_plan_stats_pub_ = nh_.advertise<spirit_msgs::PlanStats>(
+    "global_body_planner/best_plan_stats",1);
+  avg_plan_stats_pub_ = nh_.advertise<spirit_msgs::PlanStats>(
+    "global_body_planner/avg_plan_stats",1);
 
   // Initialize the current path cost to infinity to ensure the first solution is stored
   current_cost_ = INFTY;
   robot_state_ = start_state_;
 
   spirit_utils::loadROSParam(nh,"global_body_planner/H_MAX", planner_config_.H_MAX);
+  spirit_utils::loadROSParam(nh,"global_body_planner/H_NOM", planner_config_.H_NOM);
   spirit_utils::loadROSParam(nh,"global_body_planner/H_MIN", planner_config_.H_MIN);
   spirit_utils::loadROSParam(nh,"global_body_planner/V_MAX", planner_config_.V_MAX);
   spirit_utils::loadROSParam(nh,"global_body_planner/V_NOM", planner_config_.V_NOM);
@@ -134,38 +139,41 @@ void GlobalBodyPlanner::goalStateCallback(const geometry_msgs::PointStamped::Con
 
   goal_state_[0] = goal_state_msg_->point.x;
   goal_state_[1] = goal_state_msg_->point.y;
-  goal_state_[2] = 0.3 + planner_config_.terrain.getGroundHeight(
-    goal_state_msg_->point.x, goal_state_msg_->point.y);
+  goal_state_[2] = planner_config_.H_NOM;
 
   restart_flag_ = true;
 }
 
-void GlobalBodyPlanner::updateRestartFlag() {
+void GlobalBodyPlanner::restartPlanner() {
+  ROS_INFO("GBP starting from current robot state");
+
+  start_state_ = robot_state_;
+  replan_start_time_ = 0;
+  current_cost_ = INFTY;
+  avg_plan_stats_msg_ = spirit_msgs::PlanStats();
+  best_plan_stats_msg_ = spirit_msgs::PlanStats();
+
+  restart_flag_ = false;
+}
+
+
+int GlobalBodyPlanner::initPlanner() {
 
   if (body_plan_.empty()) {
     restart_flag_ = true;
-    return;
+    return 0;
   }
 
   std::vector<double> current_state_in_plan_ = body_plan_.front();
   if (poseDistance(robot_state_, current_state_in_plan_) > state_error_threshold_) {
     restart_flag_ = true;
   }
-}
-
-
-int GlobalBodyPlanner::initPlanner() {
 
   int start_index = 0;
 
-  updateRestartFlag();
-
+  // Restart if requested for whatever reason
   if (restart_flag_) {
-    start_state_ = robot_state_;
-    replan_start_time_ = 0;
-    current_cost_ = INFTY;
-    restart_flag_ = false;
-    ROS_INFO("GBP starting from current robot state");
+    restartPlanner();
   } else {
     // Loop through t_plan_ to find the next state after the committed horizon, set as start state
     int N = t_plan_.size();
@@ -181,6 +189,7 @@ int GlobalBodyPlanner::initPlanner() {
       }
     }
   }
+
   return start_index;
 }
 
@@ -253,7 +262,12 @@ void GlobalBodyPlanner::callPlanner() {
     if (path_length < current_cost_) {
       state_sequence_ = state_sequence;
       action_sequence_ = action_sequence;
-      current_cost_ = path_length;
+      
+      best_plan_stats_msg_.solve_time = plan_time;
+      best_plan_stats_msg_.plan_length = path_length;
+      best_plan_stats_msg_.plan_duration = path_duration;
+      best_plan_stats_msg_.vertices_generated = vertices_generated;
+      current_cost_ = best_plan_stats_msg_.plan_length;
 
       // Clear out old plan and interpolate to get full body plan
       t_plan_.erase(t_plan_.begin()+start_index, t_plan_.end());
@@ -287,6 +301,11 @@ void GlobalBodyPlanner::callPlanner() {
   // Report averaged statistics if num_calls_ > 1
   if (num_calls_ > 1)
   {
+    avg_plan_stats_msg_.solve_time = total_solve_time/num_calls_;
+    avg_plan_stats_msg_.plan_length = total_path_length/num_calls_;
+    avg_plan_stats_msg_.plan_duration = total_path_duration/num_calls_;
+    avg_plan_stats_msg_.vertices_generated = total_vertices_generated/num_calls_;
+
     std::cout << "Average vertices generated: " << total_vertices_generated/num_calls_ <<  std::endl;
     std::cout << "Average solve time: " << total_solve_time/num_calls_ << " s" << std::endl;
     std::cout << "Average path length: " << total_path_length/num_calls_ << " s" << std::endl;
@@ -389,6 +408,11 @@ void GlobalBodyPlanner::publishPlan() {
   body_plan_pub_.publish(body_plan_msg);
   discrete_body_plan_pub_.publish(discrete_body_plan_msg);
 
+  // Publish stats
+  best_plan_stats_msg_.header.stamp = plan_timestamp_;
+  avg_plan_stats_msg_.header.stamp = plan_timestamp_;
+  best_plan_stats_pub_.publish(best_plan_stats_msg_);
+  avg_plan_stats_pub_.publish(avg_plan_stats_msg_);
 }
 
 void GlobalBodyPlanner::waitForData() {
@@ -434,7 +458,7 @@ void GlobalBodyPlanner::spin() {
   // Enter main spin
   while (ros::ok()) {
 
-    // IF allowed, continue updating and publishing the plan
+    // If allowed, continue updating and publishing the plan
     if (replanning_allowed_) {
       callPlanner();
       publishPlan();

@@ -6,6 +6,7 @@
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 
+#include <spirit_msgs/PlanStats.h>
 #include <spirit_msgs/BodyPlan.h>
 #include <spirit_msgs/RobotState.h>
 #include <spirit_utils/ros_utils.h>
@@ -40,6 +41,16 @@ class GlobalBodyPlanner {
     void callPlanner();
 
     /**
+     * @brief Get the current planner config struct
+     */
+    PlannerConfig getPlannerConfig();
+
+    /**
+     * @brief Set the current planner config struct
+     */
+    void setPlannerConfig(const PlannerConfig &config);
+
+    /**
      * @brief Primary work function in class, called in node file for this component
      */
     void spin();
@@ -64,9 +75,9 @@ class GlobalBodyPlanner {
     void goalStateCallback(const geometry_msgs::PointStamped::ConstPtr& msg);
 
     /**
-     * @brief Check if a restart is required
+     * @brief Restart the planner
      */
-    void updateRestartFlag();
+    void restartPlanner();
 
     /**
      * @brief Initialize the planner by clearing out old plan data and setting the start state
@@ -118,6 +129,12 @@ class GlobalBodyPlanner {
 
     /// Publisher for discrete states in body plan messages
     ros::Publisher discrete_body_plan_pub_;
+
+    /// Publisher for stats of the current best plan
+    ros::Publisher best_plan_stats_pub_;
+
+    /// Publisher for stats of the average plan
+    ros::Publisher avg_plan_stats_pub_;
 
     /// Topic name for terrain map (needed to ensure data has been received)
     std::string terrain_map_topic_;
@@ -208,6 +225,12 @@ class GlobalBodyPlanner {
 
     /// Boolean for whether replanning is allowed
     bool replanning_allowed_;
+
+    /// Statistics for the current best plan
+    spirit_msgs::PlanStats best_plan_stats_msg_;
+
+    /// Statistics for the average of the plans
+    spirit_msgs::PlanStats avg_plan_stats_msg_;
 
 };
 
