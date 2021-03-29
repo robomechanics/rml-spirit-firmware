@@ -1,8 +1,12 @@
 #include "spirit_utils/terrain_quality_processing.h"
-//#define __FUNCTION__ "getCost"
-TerrainQualityProcessing::TerrainQualityProcessing(ros::NodeHandle &nh) : nh_(nh), outputMap({"cost","elevation"}) { 
+TerrainQualityProcessing::TerrainQualityProcessing(ros::NodeHandle &nh) : nh_(nh) { 
     publisher_ = nh.advertise<grid_map_msgs::GridMap>("grid_map_process", 1, true); 
     subscriber_ = nh.subscribe("/grid_map_filter_demo/filtered_map",1 , &TerrainQualityProcessing::filteredMapCallback, this); 
+    outputMap.setFrameId("map");
+    outputMap.setGeometry(grid_map::Length(1.2, 2.0), 0.03);
+    outputMap.add("cost"); 
+    outputMap["cost"].setConstant(0.0);
+
 }
 
 void TerrainQualityProcessing::filteredMapCallback(const grid_map_msgs::GridMap& message) { 
@@ -17,12 +21,13 @@ void TerrainQualityProcessing::processTerrainMap(grid_map::Position center, doub
     double min_cost = 100000; 
     double current_cost; 
 
+
+
     // Store layers locally for efficency 
     grid_map::Matrix& elevation = filteredMap["elevation"];
     grid_map::Matrix& cost =  outputMap["cost"]; 
     grid_map::Matrix& traversability = filteredMap["traversability"]; 
 
-    outputMap["cost"].setConstant(0.0);
     outputMap.add("elevation",elevation); 
 
     grid_map::Index min_index;
@@ -60,12 +65,15 @@ void TerrainQualityProcessing::processTerrainMap(grid_map::Position center, doub
 } 
 
 double TerrainQualityProcessing::getCost(grid_map::Matrix& data,grid_map::Index index) { 
-    spirit_utils::FunctionTimer timer(__FUNCTION__);
+    //spirit_utils::FunctionTimer timer(__FUNCTION__);
     double query =  data(index(0),index(1));
-    timer.report(); 
+    //timer.report(); 
     return query;  
 }
 
+double TerrainQualityProcessing::getCostInterp(grid_map::GridMap gm,std::string &layer, const grid_map::Position pos,grid_map::InterpolationMethods interp) { 
+    return gm.atPosition(layer,pos,interp); 
+}
 
 void TerrainQualityProcessing::publish() {
   outputMap.setTimestamp(ros::Time::now().toNSec());

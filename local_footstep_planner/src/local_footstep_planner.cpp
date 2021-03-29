@@ -39,6 +39,8 @@ LocalFootstepPlanner::LocalFootstepPlanner(ros::NodeHandle nh) {
     &LocalFootstepPlanner::bodyPlanCallback, this);
   foot_plan_discrete_pub_ = nh_.advertise<
     spirit_msgs::MultiFootPlanDiscrete>(foot_plan_discrete_topic,1);
+  optimized_foot_plan_discrete_pub_ = nh_.advertise<
+    spirit_msgs::MultiFootPlanDiscrete>(foot_plan_discrete_topic,1);
   foot_plan_continuous_pub_ = nh_.advertise<
     spirit_msgs::MultiFootPlanContinuous>(foot_plan_continuous_topic,1);
 }
@@ -439,6 +441,9 @@ void LocalFootstepPlanner::publishDiscretePlan() {
     multi_foot_plan_discrete_msg.feet.push_back(foot_plan_discrete_msg);
   }
 
+  // Nominal publisher and Optimal publisher 
+  // map_ attribute for MapSearch class 
+  // spiritmsgs::MultiFootPlanDiscrete optimized_multi_foot_plan_discrete_msg  = computeOptimizedFootholds(multi_footplan_discrete_msg) 
   // Publish the whole plan to the topic
   foot_plan_discrete_pub_.publish(multi_foot_plan_discrete_msg);
 }

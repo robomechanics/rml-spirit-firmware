@@ -3,6 +3,7 @@
 
 #include <grid_map_core/grid_map_core.hpp>
 #include <grid_map_ros/grid_map_ros.hpp>
+#include <grid_map_core/TypeDefs.hpp>
 #include <grid_map_msgs/GridMap.h>
 #include <ros/ros.h>
 #include <chrono>
@@ -25,7 +26,10 @@ class TerrainQualityProcessing {
          */
         void spin(); 
 
-        double getCost(grid_map::Matrix& data,grid_map::Index index);
+        double getCost(grid_map::Matrix& data, grid_map::Index index);
+
+        double getCostInterp(grid_map::GridMap gm,std::string &layer, const grid_map::Position pos, grid_map::InterpolationMethods interp); 
+
         
     private:
 

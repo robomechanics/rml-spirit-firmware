@@ -136,7 +136,7 @@ bool FastTerrainMap::isInRange(const double x, const double y) {
 }
 
 double FastTerrainMap::getGroundHeight(const double x, const double y) {
-  spirit_utils::FunctionTimer timer(__FUNCTION__);
+  //spirit_utils::FunctionTimer timer(__FUNCTION__);
   
   double x1, x2, y1, y2;
 
@@ -172,7 +172,7 @@ double FastTerrainMap::getGroundHeight(const double x, const double y) {
   double fx2y2 = z_data_[ix+1][iy+1];
   double height = 1.0/((x2-x1)*(y2-y1))*(fx1y1*(x2-x)*(y2-y) + fx2y1*(x-x1)*(y2-y) + fx1y2*(x2-x)*(y-y1) + fx2y2*(x-x1)*(y-y1));
 
-  timer.report();
+  //timer.report();
   return height;
 }
 

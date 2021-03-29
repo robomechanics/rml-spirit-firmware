@@ -88,6 +88,10 @@ class LocalFootstepPlanner {
     /// Publisher for discrete foot plan messages
     ros::Publisher foot_plan_discrete_pub_;
 
+    /// Publisher for optimized discrete foot plan messages 
+
+    ros::Publisher optimized_foot_plan_discrete_pub_;
+
     /// Publisher for continuous
     ros::Publisher foot_plan_continuous_pub_;
 
